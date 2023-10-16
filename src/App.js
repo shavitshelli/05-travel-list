@@ -1,13 +1,5 @@
 import { useState } from "react";
 
-const initialItems = [
-  { id: 1, description: "Passports", quantity: 2, packed: false },
-  { id: 2, description: "Socks", quantity: 12, packed: true },
-  { id: 3, description: "Charger", quantity: 1, packed: false },
-  { id: 4, description: "Computer", quantity: 1, packed: false },
-  { id: 5, description: "Keys", quantity: 1, packed: true },
-];
-
 export default function App() {
   const [items, setItems] = useState([]);
 
@@ -18,11 +10,29 @@ export default function App() {
     setItems((items) => [...items, item]);
   }
 
+  function handleDeleteItems(item) {
+    setItems((items) => items.filter((currItem) => currItem.id !== item.id));
+  }
+
+  function handleToggleItem(item) {
+    setItems((items) =>
+      items.map((currItem) =>
+        currItem.id === item.id
+          ? { ...currItem, packed: !currItem.packed }
+          : currItem
+      )
+    );
+  }
+
   return (
     <div className="app">
       <Logo />
       <Form onAddItems={handleAddItems} />
-      <PackingList items={items} />
+      <PackingList
+        items={items}
+        onDeleteItem={handleDeleteItems}
+        onToggleItems={handleToggleItem}
+      />
       <Stats />
     </div>
   );
@@ -31,6 +41,7 @@ export default function App() {
 function Logo() {
   return <h1>🌴 Far Away 💼</h1>;
 }
+
 function Form({ onAddItems }) {
   //The reason for us to want to use controlled elements is to be able to control all
   //the elements from inside react amd not be controled from within the DOM therfore we need state
@@ -81,25 +92,39 @@ function Form({ onAddItems }) {
     </form>
   );
 }
-function PackingList({ items }) {
+function PackingList({ items, onDeleteItem, onToggleItems }) {
   return (
     <div className="list">
       <ul>
         {items.map((item) => (
-          <Item item={item} key={item.id} />
+          <Item
+            item={item}
+            onDeleteItem={onDeleteItem}
+            onToggleItems={onToggleItems}
+            key={item.id}
+          />
         ))}
       </ul>
     </div>
   );
 }
 
-function Item({ item }) {
+function Item({ item, onDeleteItem, onToggleItems }) {
   return (
     <li>
+      <input
+        type="checkbox"
+        value={item.packed}
+        onChange={() => {
+          onToggleItems(item);
+        }}
+      />
       <span style={item.packed ? { textDecoration: "line-through" } : {}}>
         {item.quantity} {item.description}
       </span>
-      <button>❌</button>
+      {/* arrow func is nessesary because we need to wait for the component (button) to be pressed 
+      otherwise without arrow function it renders automaticlly and its not allowed   */}
+      <button onClick={() => onDeleteItem(item)}>❌</button>
     </li>
   );
 }
