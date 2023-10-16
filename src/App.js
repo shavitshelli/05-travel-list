@@ -23,6 +23,14 @@ export default function App() {
     );
   }
 
+  function habdleClearItems() {
+    const confirmed = window.confirm(
+      "Are you sure u want to delete all items?"
+    );
+
+    if (confirmed) setItems([]);
+  }
+
   return (
     <div className="app">
       <Logo />
@@ -31,6 +39,7 @@ export default function App() {
         items={items}
         onDeleteItem={handleDeleteItems}
         onToggleItems={handleToggleItem}
+        onClearItems={habdleClearItems}
       />
       <Stats items={items} />
     </div>
@@ -91,7 +100,7 @@ function Form({ onAddItems }) {
     </form>
   );
 }
-function PackingList({ items, onDeleteItem, onToggleItems }) {
+function PackingList({ items, onDeleteItem, onToggleItems, onClearItems }) {
   const [sortBy, setSortby] = useState("input");
 
   let sortedItems;
@@ -127,6 +136,14 @@ function PackingList({ items, onDeleteItem, onToggleItems }) {
           <option value="description">Sort by description order</option>
           <option value="packed">Sort by packed status</option>
         </select>
+        <button
+          onClick={() => {
+            onClearItems();
+          }}
+        >
+          {" "}
+          Clear list
+        </button>
       </div>
     </div>
   );
